@@ -1,13 +1,16 @@
 const express = require('express')
+require('dotenv').config();
 
 const app = express();
 const cors = require('cors');
-const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors, celebrate, Joi } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { login, createUser } = require('./controllers/users');
+
+const userRouter = require('./routes/users');
+const movieRouter = require('./routes/movies');
 
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
@@ -27,7 +30,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use(requestLogger);
-
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -38,15 +40,14 @@ app.post('/signin', celebrate({
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/^(https?:\/\/)([\da-z.-]+)\.([a-z]{2,6})([/\w\W.-]*)#?$/),
     email: Joi.string().required().email(),
     password: Joi.string().min(8),
   }),
 }), createUser);
 
 app.use(auth);
-app.use('/users', require('./routes/users'));
+app.use('/users', userRouter);
+app.use('/movies', movieRouter);
 
 app.use(errorLogger);
 app.use((_req, _res, next) => {
@@ -56,7 +57,7 @@ app.use(errors());
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
   const { statusCode = 500, message } = err;
-
+  console.log(err);
   res
     .status(statusCode)
     .send({
