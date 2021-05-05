@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express');
 require('dotenv').config();
 
 const app = express();
@@ -24,7 +24,6 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
   useFindAndModify: false,
 });
 
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
@@ -33,15 +32,15 @@ app.use(requestLogger);
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().min(8),
+    password: Joi.string().required().min(8),
   }),
 }), login);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
     email: Joi.string().required().email(),
-    password: Joi.string().min(8),
+    password: Joi.string().required().min(8),
   }),
 }), createUser);
 
@@ -57,7 +56,6 @@ app.use(errors());
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
   const { statusCode = 500, message } = err;
-  console.log(err);
   res
     .status(statusCode)
     .send({
@@ -66,7 +64,6 @@ app.use((err, _req, res, _next) => {
         : message,
     });
 });
-
 
 app.listen(PORT, () => {
   const date = new Date();

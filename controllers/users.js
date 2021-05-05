@@ -7,11 +7,10 @@ const ValidationError = require('../errors/validation-err');
 const NotFoundError = require('../errors/not-found-err');
 const ConflictError = require('../errors/conflict-err');
 
-const { NODE_ENV } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 // eslint-disable-next-line consistent-return
 module.exports.createUser = (req, res, next) => {
-  console.log('deded')
   const {
     name, email, password,
   } = req.body;
@@ -51,7 +50,6 @@ module.exports.getMe = (req, res, next) => {
     }))
     .catch(next);
 };
-
 
 module.exports.updateMe = (req, res, next) => {
   const { name, email } = req.body;

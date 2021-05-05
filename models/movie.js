@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const UnauthorizedError = require('../errors/unauthorized-err');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -31,7 +30,7 @@ const movieSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [true, 'Поле обязательно для заполнения']
+    required: [true, 'Поле обязательно для заполнения'],
   },
   image: {
     type: String,
