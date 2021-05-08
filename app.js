@@ -5,64 +5,39 @@ const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { errors, celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
+const helmet = require('helmet');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { login, createUser } = require('./controllers/users');
+const centralizedErrorHandler = require('./middlewares/centralizedErrorHandler');
+const indexRouter = require('./routes/index');
+const limiter = require('./middlewares/limiter');
 
-const userRouter = require('./routes/users');
-const movieRouter = require('./routes/movies');
-
-const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DB_ADDRESS = 'mongodb://localhost:27017/bitfilmsdb' } = process.env;
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
 });
 
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
-
+app.use(limiter);
 app.use(requestLogger);
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), login);
+app.use(indexRouter);
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), createUser);
-
-app.use(auth);
-app.use('/users', userRouter);
-app.use('/movies', movieRouter);
-
-app.use(errorLogger);
 app.use((_req, _res, next) => {
   next(new NotFoundError('Не найдено!'));
 });
+
+app.use(errorLogger);
 app.use(errors());
-app.use((err, _req, res) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-});
+app.use(centralizedErrorHandler);
 
 app.listen(PORT, () => {
   const date = new Date();

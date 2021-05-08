@@ -53,6 +53,7 @@ module.exports.getMe = (req, res, next) => {
 
 module.exports.updateMe = (req, res, next) => {
   const { name, email } = req.body;
+
   User.findByIdAndUpdate(req.user._id, { email, name }, {
     new: true,
     runValidators: true,
@@ -64,7 +65,9 @@ module.exports.updateMe = (req, res, next) => {
     }))
     .catch((err) => {
       let error;
-      if (err.name === 'CastError') {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        error = new ConflictError('Пользователь существует');
+      } else if (err.name === 'CastError') {
         error = new CastError('Переданы некорректные данные');
       } else if (err.name === 'ValidationError') {
         error = new ValidationError('Ошибка валидации');

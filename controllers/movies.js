@@ -28,7 +28,7 @@ module.exports.addMovie = (req, res, next) => {
     nameEN,
     thumbnail,
     movieId,
-    owner: req.user._id
+    owner: req.user._id,
   })
     .then((movie) => res.send({ movie }))
     .catch((err) => {
@@ -66,5 +66,12 @@ module.exports.deleteMovieById = (req, res, next) => {
       } else {
         next(new ForbiddenError('Запрещено!'));
       }
+    })
+    .catch((err) => {
+      let error;
+      if (err.name === 'DocumentNotFoundError') {
+        error = new NotFoundError('Такого фильма нет');
+      }
+      next(error);
     });
 };
