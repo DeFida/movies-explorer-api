@@ -9,7 +9,6 @@ const ConflictError = require('../errors/conflict-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-// eslint-disable-next-line consistent-return
 module.exports.createUser = (req, res, next) => {
   const {
     name, email, password,
@@ -39,6 +38,7 @@ module.exports.createUser = (req, res, next) => {
         }
         next(error);
       }));
+  return undefined;
 };
 
 module.exports.getMe = (req, res, next) => {

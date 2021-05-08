@@ -28,6 +28,7 @@ module.exports.addMovie = (req, res, next) => {
     nameEN,
     thumbnail,
     movieId,
+    owner: req.user._id
   })
     .then((movie) => res.send({ movie }))
     .catch((err) => {
@@ -45,13 +46,12 @@ module.exports.deleteMovieById = (req, res, next) => {
   const userId = req.user._id;
   Movie.findById(req.params.movieId)
     .then((found) => {
-      // eslint-disable-next-line
       if (found === null) {
         const error = new NotFoundError('Такого фильма нет');
         next(error);
         return;
       }
-      if (found.owner === userId) {
+      if (found.owner.toString() === userId) {
         Movie.findByIdAndRemove(req.params.movieId)
           .then((movie) => res.status(200).send({ data: movie }))
           .catch((err) => {

@@ -5,19 +5,10 @@ const movieSchema = new mongoose.Schema({
   country: {
     type: String,
     required: [true, 'Поле обязательно для заполнения'],
-    minlength: 2,
-    maxlength: 30,
   },
   director: {
     type: String,
     required: [true, 'Поле обязательно для заполнения'],
-    unique: [true, 'Это уникальное поле, пользователь с этим email уже зарегистрирован'],
-    validate: {
-      validator: (v) => validator.isEmail(v),
-      message: 'Поле "email" должно быть валидным email-адресом',
-    },
-    minlength: 2,
-    maxlength: 30,
   },
   duration: {
     type: Number,
@@ -69,7 +60,7 @@ const movieSchema = new mongoose.Schema({
   },
   movieId: {
     required: [true, 'Поле обязательно для заполнения'],
-    type: String,
+    type: Number,
   },
   nameRU: {
     type: String,

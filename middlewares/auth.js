@@ -7,7 +7,6 @@ const AuthError = require('../errors/auth-err');
 const handleAuthError = () => new AuthError('Необходима авторизация');
 const extractBearerToken = (header) => header.replace('Bearer ', '');
 
-// eslint-disable-next-line consistent-return
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -24,6 +23,7 @@ const auth = (req, res, next) => {
 
   req.user = payload;
   next();
+  return undefined;
 };
 
 module.exports = auth;

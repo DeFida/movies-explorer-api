@@ -53,8 +53,7 @@ app.use((_req, _res, next) => {
   next(new NotFoundError('Не найдено!'));
 });
 app.use(errors());
-// eslint-disable-next-line no-unused-vars
-app.use((err, _req, res, _next) => {
+app.use((err, _req, res) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
